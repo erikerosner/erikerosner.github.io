@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Erik Rosner</title>
+  <meta name="description" content="Erik Rosner is a designer and pickleball pro who makes thoughtful things where craft meets play.">
+  <meta name="theme-color" content="#F6C644">
+  <meta name="format-detection" content="telephone=no, email=no, address=no">
+  <link rel="canonical" href="https://erikrosner.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://erikrosner.com/">
+  <meta property="og:title" content="Erik Rosner">
+  <meta property="og:description" content="Designer and pickleball pro who makes thoughtful things where craft meets play.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <script>document.documentElement.classList.add('loading');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- All sizes, spacing, weights, line heights, tracking and hover values: tokens.css -->
+  <link href="tokens.css" rel="stylesheet">
+  <!-- Body font (Google Sans Flex): requests only the weights set in tokens.css
+       (--font-weight-body, --font-weight-intro) plus the slant axis for the clue.
+       The name fonts load later from themes.csv. -->
+  <script>
+    (() => {
+      const t = getComputedStyle(document.documentElement);
+      const weights = [...new Set(['--font-weight-body', '--font-weight-intro']
+        .map(n => Math.round(parseFloat(t.getPropertyValue(n))) || 400))].sort((a, b) => a - b);
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Google+Sans+Flex:slnt,wght@'
+                + weights.map(w => '-10..0,' + w).join(';') + '&display=swap';
+      document.head.appendChild(link);
+    })();
+  </script>
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:slnt,wght@-10..0,400&display=swap" rel="stylesheet"></noscript>
+  <style>
+    /* Theme colors are replaced per palette from themes.csv; these are the first-paint defaults.
+       --hover is registered as a color so it can fade like the background and text do: everything
+       drawn in the hover color (link lines, the name's line, icon, clue) changes together on click. */
+    @property --hover { syntax: '<color>'; inherits: true; initial-value: #163C6D; }
+    :root {
+      --bg: #F6C644;
+      --fg: #163C6D;
+      --hover: #163C6D;
+      transition: --hover var(--theme-transition);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ---------- Page: one section, centered in the window inside the page padding ---------- */
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding:
+        calc(var(--page-padding-top) + var(--safe-top))
+        calc(var(--page-padding-x) + var(--safe-right))
+        calc(var(--page-padding-bottom) + var(--safe-bottom))
+        calc(var(--page-padding-x) + var(--safe-left));
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Google Sans Flex", system-ui, -apple-system, sans-serif;
+      font-weight: var(--font-weight-body);
+      font-size: var(--font-size-body);
+      text-align: left;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      transition: background-color var(--theme-transition), color var(--theme-transition);
+    }
+
+    /* ---------- First load: stay blank until the random palette + its font are ready ----------
+       The "loading" class is added by a tiny script in <head>, so with JS off the page just shows. */
+    main { transition: opacity var(--page-reveal-duration) ease; }
+    html.loading body { background: transparent; transition: none; }
+    html.loading main { opacity: 0; }
+
+    /* Main fills the window. Its content is aligned to the TOP, so when a theme changes the
+       name font or the clue length, everything grows or shrinks downward and nothing above
+       moves. JS sets --main-offset so the tallest of all themes sits centered in the window
+       (see placeContent); the others start at the same spot. If the content is taller than
+       the window, the page simply scrolls. */
+    main {
+      flex: 1 0 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding-top: var(--main-offset, 0px);
+      gap: var(--space-intro-body);
+      overflow-wrap: break-word;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ---------- Body links: Osmo Supply "Underline Link Animation" (alt version) ----------
+       Underlined by default. On hover (and keyboard focus) the line slides away to the right, then a
+       fresh one draws in from the left; on leave it plays the other way. Same timing, curve, delay,
+       thickness and position as Osmo's. Osmo draws the two lines with ::before/::after, which can only
+       underline the first row of a link that wraps; here they are two background layers instead, so
+       links that wrap onto a second row are underlined on every row. Values: tokens.css (--link-underline-*). */
+    @property --ul-out { syntax: '<percentage>'; inherits: false; initial-value: 100%; }
+    @property --ul-in  { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+    [data-underline-link] {
+      text-decoration: none;
+      --ul-out: 100%;                                  /* Osmo ::before — the line you see at rest */
+      --ul-in: 0%;                                     /* Osmo ::after — the line that draws in on hover */
+      padding-bottom: var(--link-underline-thickness); /* Osmo: bottom: -0.0625em, below the text box */
+      background-image:                                /* the line is the theme's hover color; the words stay the text color */
+        linear-gradient(var(--hover), var(--hover)),
+        linear-gradient(var(--hover), var(--hover));
+      background-repeat: no-repeat;
+      background-size:
+        var(--ul-out) var(--link-underline-thickness),
+        var(--ul-in) var(--link-underline-thickness);
+      background-position: left bottom, right bottom;   /* Osmo transform-origin: left / right */
+      transition:
+        --ul-out var(--link-underline-duration) var(--link-underline-ease) var(--link-underline-delay),
+        --ul-in var(--link-underline-duration) var(--link-underline-ease) 0s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      [data-underline-link="alt"]:hover {
+        --ul-out: 0%;
+        --ul-in: 100%;
+        background-position: right bottom, left bottom;
+        transition:
+          --ul-out var(--link-underline-duration) var(--link-underline-ease) 0s,
+          --ul-in var(--link-underline-duration) var(--link-underline-ease) var(--link-underline-delay);
+      }
+    }
+    [data-underline-link="alt"]:focus-visible {          /* keyboard: same animation as hover */
+      --ul-out: 0%;
+      --ul-in: 100%;
+      background-position: right bottom, left bottom;
+      transition:
+        --ul-out var(--link-underline-duration) var(--link-underline-ease) 0s,
+        --ul-in var(--link-underline-duration) var(--link-underline-ease) var(--link-underline-delay);
+    }
+
+    /* ---------- Name: hand-drawn underline (Osmo Supply "Draw Random Underline") ----------
+       On hover or keyboard focus, one of six hand-drawn lines draws in under the name (GSAP DrawSVG),
+       and draws out when the pointer leaves. The line lives in its own layer (.underline-layer) so it
+       never moves the text. It takes the theme's hover color. Sizes and timing: tokens.css.
+
+       Hover color (the "hover" column of themes.csv) is used for: the body links' underline, the
+       name's drawn underline, the clue icon while hovered/focused, and the clue text. The words of
+       the links and the name stay the text color. */
+    .hint-button:hover,
+    .hint-button:focus-visible { color: var(--hover); }
+    a:focus-visible,
+    .wordmark:focus-visible { outline: none; }      /* the underline is the focus indicator */
+    .hint-button:focus-visible {                    /* the icon has no underline: a ring shows keyboard focus */
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+      border-radius: 0.25em;
+    }
+
+    .underline-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+    .underline-box {                                  /* Osmo: .text-draw__box */
+      position: absolute;
+      color: var(--hover);
+      pointer-events: none;
+      transition: color var(--theme-transition);     /* fades with the theme if a click happens mid-hover */
+    }
+    .underline-box svg {                              /* Osmo: .text-draw__box svg */
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      overflow: visible !important;
+    }
+
+    /* If GSAP can't load (blocked CDN, JS off), a plain underline still marks hover and focus. */
+    html:not(.draw-ready) .wordmark:hover,
+    html:not(.draw-ready) .wordmark:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+
+    /* ---------- Theme buttons: the name and the clue icon ----------
+       Two real buttons with one action: each click moves to the next palette. */
+    .wordmark,
+    .hint-button {
+      -webkit-appearance: none;
+      appearance: none;
+      background: none;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: inherit;
+      letter-spacing: inherit;
+      line-height: inherit;
+      text-align: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: color var(--theme-transition);
+    }
+
+    /* ---------- Intro: the name sits inline at the start of the sentence ---------- */
+    .intro {
+      font-weight: var(--font-weight-intro);
+      font-size: var(--font-size-intro);
+      line-height: var(--line-height-intro);
+      letter-spacing: var(--letter-spacing-intro);
+      max-width: var(--intro-max-width);
+      text-wrap: pretty;                        /* no one-word last lines where supported */
+    }
+    .wordmark {
+      font-family: var(--name-font, "Ballet"), cursive;   /* name_font from themes.csv */
+      font-weight: var(--name-weight, 400);                /* name_weight from themes.csv */
+      font-optical-sizing: auto;
+      font-size: calc(var(--font-size-name) * var(--name-scale, 1));   /* name_size from themes.csv */
+      line-height: var(--line-height-name);
+      letter-spacing: var(--letter-spacing-name);
+      vertical-align: baseline;
+      position: relative;
+    }
+    /* Click area = the full height of the intro's row (the name's own line is shorter on purpose). */
+    .wordmark::before {
+      content: "";
+      position: absolute;
+      inset: calc(var(--font-size-intro) * (1 - var(--line-height-intro)) / 2) 0;
+    }
+
+    /* ---------- Body: two columns sized by characters per line ----------
+       Each column is --body-measure wide (never wider than the page). When two no longer
+       fit side by side, the grid drops to one column on its own — no breakpoint needed.
+       The block sits at the right edge (--columns-align), as in the mockup. */
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, min(100%, var(--body-measure)));
+      justify-content: var(--columns-align);
+      column-gap: var(--space-column-gap);
+      row-gap: var(--space-paragraph);
+      font-size: var(--font-size-body);
+      line-height: var(--line-height-body);
+      letter-spacing: var(--letter-spacing-body);
+    }
+    .column {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-paragraph);
+    }
+    .column p { text-wrap: pretty; }
+    .nowrap { white-space: nowrap; }      /* keeps hyphenated phrases on one line */
+
+    /* ---------- Hint: icon button + the clue for the active theme ----------
+       The clue is invisible until the icon is hovered or focused, then eases in and slides
+       into place. Its space is always reserved, so showing it never moves anything. */
+    .hint {                          /* Figma: icon on the left, clue to its right, aligned to the top */
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--space-icon-hint);
+    }
+    /* The icon sits in a padded container: a bigger hover / click / tap area. An equal negative
+       margin cancels the padding, so the icon itself stays exactly where it was. */
+    .hint-button {
+      position: relative;
+      display: block;
+      padding: var(--hint-hit-area);
+      margin: calc(var(--hint-hit-area) * -1);
+    }
+    .hint-button__content {          /* Osmo: data-magnetic-inner-target */
+      position: relative;
+      display: block;
+    }
+    .hint-icon {
+      display: block;
+      width: var(--hint-icon-size);
+      height: var(--hint-icon-size);
+      fill: currentColor;
+    }
+    .hint-text {
+      color: var(--hover);           /* the clue is drawn in the theme's hover color */
+      font-size: var(--font-size-hint);
+      line-height: var(--line-height-hint);
+      letter-spacing: var(--letter-spacing-hint);
+      font-style: var(--font-style-hint);
+      text-wrap: pretty;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(calc(var(--hint-shift) * -1));
+      transition:
+        opacity var(--hint-reveal-duration) ease-in,          /* leaving: ease in */
+        transform var(--hint-reveal-duration) ease-in;
+    }
+    .hint-follow {                   /* moves with the magnetic button (JS); the clue inside does its own fade/slide */
+      position: relative;
+      display: block;
+      pointer-events: none;          /* never steals the pointer from the icon's padded hit area next to it */
+      flex: 1 1 auto;
+      min-width: 0;
+      /* The clue's first line is centred on the icon (as in the Figma comps); longer clues wrap below it. */
+      margin-top: calc((var(--hint-icon-size) - var(--line-height-hint) * 1em) / 2);
+    }
+    .hint-button:hover + .hint-follow .hint-text,
+    .hint-button:focus-visible + .hint-follow .hint-text {
+      opacity: 1;
+      transform: none;
+      transition-timing-function: ease-out;                    /* arriving: ease out */
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      margin: -1px; padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ---------- Custom cursor (Osmo Supply "Velocity Based Custom Cursor") ----------
+       A pixel arrow (a pointing hand over links and buttons) replaces the browser's cursor and tilts
+       with how fast the mouse moves sideways. Outline = the theme's hover color, fill = the background.
+       It takes over only once the script runs and the mouse first moves (html.has-custom-cursor),
+       so without JavaScript, or before the first move, the normal cursor shows. Sizes: tokens.css. */
+    .cursor {                                          /* Osmo: .cursor */
+      z-index: 100;
+      pointer-events: none;
+      position: fixed;
+      inset: 0% auto auto 0%;
+    }
+    .cursor-inner { width: var(--cursor-size); display: block; }
+    .cursor-inner.pointer { width: var(--cursor-size-pointer); }
+    .cursor-inner path { transition: fill var(--theme-transition); }
+    .cursor-inner path:first-child { fill: var(--fg); }      /* Osmo: #131313 outline. Text color for now; to try the hover color, change to var(--hover) */
+    .cursor-inner path:last-child { fill: var(--bg); }       /* Osmo: #EFEEEC fill */
+
+    /* Hide browser default cursor (every element, so links and buttons don't bring it back) */
+    html.has-custom-cursor,
+    html.has-custom-cursor * { cursor: none !important; }
+
+    /* Hide custom cursor and pointer cursor */
+    .cursor,
+    .cursor-inner.pointer { display: none; }
+
+    /* Show custom cursor only when user is on the site */
+    html.has-custom-cursor:hover .cursor { display: block; }
+
+    /* Replace normal cursor with pointer on hover of link/button/custom element */
+    body:has(a:hover) .cursor-inner.pointer,
+    body:has(button:hover) .cursor-inner.pointer,
+    body:has([data-cursor]:hover) .cursor-inner.pointer { display: block; }
+    body:has(a:hover) .cursor-inner.regular,
+    body:has(button:hover) .cursor-inner.regular,
+    body:has([data-cursor]:hover) .cursor-inner.regular { display: none; }
+
+    /* Hide custom cursor on touch screens */
+    @media (hover: none) and (pointer: coarse) {
+      .cursor { display: none !important; }
+    }
+
+    /* While the theme fades (html.theme-changing, set by applyPalette for --theme-duration), these
+       elements drop their own color fade. Their colors already come from the page's fading text color
+       or from --hover (which fades itself), so a second fade on top made them lag behind: the icon
+       trailed the clue, and the name trailed the sentence. Now everything changes in step. Their own
+       fade still plays when you hover the icon or the name. */
+    html.theme-changing .wordmark,
+    html.theme-changing .hint-button,
+    html.theme-changing .underline-box { transition: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      :root, body, main, .wordmark, .hint-button { transition: none; }
+      .hint-text { transform: none; }                         /* fade only, no movement */
+      [data-underline-link] { transition: none; }            /* links: swap lines instantly */
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <h1 class="intro"><button type="button" class="wordmark" id="wordmark" aria-describedby="theme-help"><span class="wordmark-text">Erik Rosner</span></button> is a designer and pickleball pro who makes thoughtful things where craft meets play.</h1>
+
+    <!-- Every link opens in a new tab. "a short email" is plain text until the newsletter
+         signup is ready — to link it, wrap it like the others: <a data-underline-link="alt" href="…" target="_blank" rel="noopener noreferrer">…</a> -->
+    <div class="columns">
+      <div class="column">
+        <p>I make <a data-underline-link="alt" href="https://ridgeway-goods.com/" target="_blank" rel="noopener noreferrer">tees, hats and merch worth wearing</a> for a handful of my own brands. Every week, I send out a short email with pickleball mindset, tactics and strategy you can use in your next match.</p>
+        <p>I also design <a data-underline-link="alt" href="https://dribbble.com/erikrosner" target="_blank" rel="noopener noreferrer">products, brand systems and identities</a> for teams that care about the details.</p>
+      </div>
+      <div class="column">
+        <p>Ready to level up? I teach <a data-underline-link="alt" href="https://koalendar.com/e/pickleball-lesson-w-erik-rosner" target="_blank" rel="noopener noreferrer">private and group pickleball lessons</a>. Occasionally spotted in the wild at <a data-underline-link="alt" href="https://www.rallypickleball.com/therallynet/catalyzed-vol-3" target="_blank" rel="noopener noreferrer">Rally in Charlotte</a>.</p>
+        <p>Got a project or partnership in mind? <a data-underline-link="alt" href="https://form.typeform.com/to/eKoB51ql" target="_blank" rel="noopener noreferrer">Let’s talk</a>. If you prefer to email, reach me at <span class="email">hi@erikrosner.com</span>.</p>
+        <p><span class="nowrap">Behind-the-scenes</span> lives on <a data-underline-link="alt" href="https://www.instagram.com/erikrosner/" target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
+        <div class="hint">
+          <!-- Magnetic (Osmo Supply): the padded button drifts toward the pointer (strength 50),
+               the icon inside drifts a little further (inner 25) — Osmo's defaults.
+               For a gentler pull try 20 / 10. The clue's container (data-magnetic-follow) moves
+               with the button, so the clue travels and springs back together with the icon. -->
+          <button type="button" class="hint-button" id="hint-button" aria-describedby="hint-text theme-help"
+                  data-magnetic-strength="50" data-magnetic-strength-inner="25"><span class="hint-button__content" data-magnetic-inner-target><svg class="hint-icon" aria-hidden="true" focusable="false"><use id="hint-icon"></use></svg></span><span class="sr-only">Clue</span></button>
+          <div class="hint-follow" data-magnetic-follow="hint-button"><p class="hint-text" id="hint-text"></p></div>
+        </div>
+      </div>
+    </div>
+
+    <span class="sr-only" id="theme-help">Changes the color theme</span>
+  </main>
+
+  <!-- Custom cursor (Osmo Supply "Velocity Based Custom Cursor"). Colors come from CSS (the theme). -->
+  <div class="cursor" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 25 38" fill="none" class="cursor-inner regular">
+      <path d="M2.5 0H0.5V34H4.5V32H6.5V30H8.5V28H10.5V32H12.5V36H14.5V38H18.5V36H20.5V32H18.5V28H16.5V26H24.5V22H22.5V20H20.5V18H18.5V16H16.5V14H14.5V12H12.5V10H10.5V8H8.5V6H6.5V4H4.5V2H2.5V0Z" fill="#131313"></path>
+      <path d="M4.5 4H2.5V32H4.5V30H6.5V28H8.5V26H10.5V28H12.5V32H14.5V36H18.5V32H16.5V28H14.5V24H22.5V22H20.5V20H18.5V18H16.5V16H14.5V14H12.5V12H10.5V10H8.5V8H6.5V6H4.5V4Z" fill="#EFEEEC"></path>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 30 38" fill="none" class="cursor-inner pointer">
+      <path d="M12.3529 0H8.82353V1.72727L7.05882 1.72727V17.2727H5.29412L5.29412 15.5455H0V20.7273H1.76471V22.4545H3.52941V25.9091H5.29412V29.3636H7.05882V32.8182H8.82353V38H26.4706V32.8182H28.2353V27.6364H30V15.5455H28.2353V13.8182H26.4706V12.0909H22.9412L22.9412 10.3636H17.6471V8.63636H14.1176V1.72727L12.3529 1.72727V0Z" fill="#131313"></path>
+      <path d="M8.82347 1.72729V20.7273H7.05877V19H5.29406V17.2727H1.76465V20.7273H3.52935V22.4546H5.29406V25.9091H7.05877V29.3637H8.82347V32.8182H10.5882V36.2727H24.7058V32.8182H26.4705V27.6364H28.2352V15.5455H26.4705V13.8182H24.7058V19H22.9411V12.0909H19.4117V17.2727H17.647V10.3637H14.1176V17.2727H12.3529V1.72729H8.82347Z" fill="#EFEEEC"></path>
+    </svg>
+  </div>
+
+  <!-- GSAP + DrawSVG for the hover underline (exact version, so the site never changes on its own) -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/DrawSVGPlugin.min.js"></script>
+  <script>
+    /* ---------- Settings ---------- */
+    const CSV_URL = 'themes.csv';                    // every theme: colors, name font, clues + icons — source of truth
+    const ICON_SPRITE = 'assets/phosphor-icons.svg?v=78ee26d8'; // built (and version-stamped) by scripts/update_icons.py
+
+    /* ---------- Theme rotation (mirrors the Figma frames 01–26) ----------
+       Each themes.csv row is one palette (a Figma variable group), played twice:
+         round 1, side a (Figma frames 01–13): background = color_a, text = color_b, clue = clue_a + icon_a
+         round 2, side b (Figma frames 14–26): background = color_b, text = color_a, clue = clue_b + icon_b
+       Rows play top to bottom in each round. hover_a / hover_b = the hover color on side a / side b
+       (link underlines, the name's underline, the clue icon on hover, the clue text); blank → that side's text color.
+       live = 1 shows the palette, 0 keeps it in the file but off the site.
+       name_font = Google Fonts family name for "Erik Rosner", spelled exactly as on
+       fonts.google.com, e.g. "Pixelify Sans". Blank → Ballet.
+       name_weight = that font's weight: 100 thin … 300 light, 400 regular, 700 bold … 900 black.
+       Only weights the font actually has (see "Styles" on fonts.google.com). Blank → 400.
+       name_size = size multiplier for that font (1 = default, 0.8 = 20% smaller). Blank → 1.
+       Clicking the name or the clue icon both move to the next step. */
+
+    const root = document.documentElement;
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    const hintText = document.getElementById('hint-text');
+    const hintIcon = document.getElementById('hint-icon');
+    const hintButton = document.getElementById('hint-button');
+    const wordmark = document.getElementById('wordmark');
+    const wordmarkText = wordmark.querySelector('.wordmark-text');
+    let SEQUENCE = [];
+    let current = 0;
+    let fontsReady = Promise.resolve();
+
+    // Minimal CSV parser: handles quoted fields, commas/quotes inside quotes, CRLF, and a BOM.
+    function parseCSV(text) {
+      const rows = []; let row = []; let field = ''; let quoted = false;
+      text = text.replace(/^﻿/, '');
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (quoted) {
+          if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+          else if (c === '"') quoted = false;
+          else field += c;
+        } else if (c === '"') quoted = true;
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\n' || c === '\r') {
+          if (c === '\r' && text[i + 1] === '\n') i++;
+          row.push(field); rows.push(row); row = []; field = '';
+        } else field += c;
+      }
+      if (field !== '' || row.length) { row.push(field); rows.push(row); }
+      return rows.filter(r => r.some(cell => cell.trim() !== ''));
+    }
+
+    // Fetches a CSV and returns { rows, get(row, column) } with case-insensitive headers.
+    async function fetchCSV(url) {
+      const res = await fetch(url, { cache: 'no-cache' }); // always check for a re-uploaded CSV
+      if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+      const [header, ...rows] = parseCSV(await res.text());
+      const col = Object.fromEntries(header.map((h, i) => [h.trim().toLowerCase(), i]));
+      return { rows, has: name => name in col, get: (r, name) => (name in col ? (r[col[name]] || '').trim() : '') };
+    }
+
+    // Accepts "#F6C644", "F6C644", "#fc4" — returns "#F6C644" style, or null if invalid.
+    function hex(value) {
+      let v = (value || '').trim();
+      if (!v) return null;
+      if (v[0] !== '#') v = '#' + v;
+      return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v) ? v.toUpperCase() : null;
+    }
+
+    // "UsersThreeIcon" → "users-three" (the symbol id in the sprite, after "ph-")
+    const iconId = name => name.replace(/Icon$/, '').replace(/(?!^)([A-Z])/g, '-$1').toLowerCase();
+
+    async function loadThemes() {
+      const { rows, has, get } = await fetchCSV(CSV_URL);
+      for (const name of ['color_a', 'color_b']) {
+        if (!has(name)) throw new Error(`${CSV_URL} is missing the "${name}" column`);
+      }
+
+      const palettes = [];
+      rows.forEach((r, i) => {
+        if (has('live') && get(r, 'live') === '0') return;     // kept in the file, not on the site
+        const a = hex(get(r, 'color_a')), b = hex(get(r, 'color_b'));
+        if (!a || !b) { console.warn(`${CSV_URL} row ${i + 2}: skipped, color_a/color_b must be hex codes`, r); return; }
+        palettes.push({
+          a, b,
+          hoverA: hex(get(r, 'hover_a')),         // blank → that side's text color
+          hoverB: hex(get(r, 'hover_b')),
+          clueA: { text: get(r, 'clue_a'), icon: iconId(get(r, 'icon_a')) },
+          clueB: { text: get(r, 'clue_b'), icon: iconId(get(r, 'icon_b')) },
+          font: get(r, 'name_font').replace(/["']/g, '') || 'Ballet',
+          weight: (() => {
+            const w = parseInt(get(r, 'name_weight'), 10);
+            return w >= 1 && w <= 1000 ? w : 400;   // blank/invalid → 400 (regular)
+          })(),
+          size: (() => {
+            const n = parseFloat(get(r, 'name_size'));
+            return n > 0 && n < 5 ? n : 1;          // blank/invalid → 1
+          })(),
+        });
+      });
+      if (!palettes.length) throw new Error(`${CSV_URL} has no valid rows`);
+
+      fontsReady = loadNameFonts(palettes.map(p => ({ font: p.font, weight: p.weight })));
+
+      const side = (p, s) => ({
+        bg: s === 'a' ? p.a : p.b, fg: s === 'a' ? p.b : p.a, hover: s === 'a' ? (p.hoverA || p.b) : (p.hoverB || p.a),
+        clue: s === 'a' ? p.clueA : p.clueB, font: p.font, weight: p.weight, size: p.size,
+      });
+      return [
+        ...palettes.map(p => side(p, 'a')),   // round 1 (Figma frames 01–13)
+        ...palettes.map(p => side(p, 'b')),   // round 2 (Figma frames 14–26)
+      ];
+    }
+
+    // Pull every name_font from Google Fonts in one request, then warm each one up
+    // so the name doesn't flash a fallback font the first time a palette appears.
+    // The name fonts only ever draw "Erik Rosner", so Google is asked for just those
+    // letters (text=…): a few KB per font instead of full character sets.
+    const NAME_FONT_TEXT = [...new Set(wordmarkText.textContent)].join('');
+    // fonts = [{ font, weight }]. Each family is requested with exactly the weights the CSV uses,
+    // e.g. "family=MuseoModerno:wght@300;700". Plain 400 needs no weight in the request.
+    function familyQuery(family, weights) {
+      const name = 'family=' + encodeURIComponent(family).replace(/%20/g, '+');
+      const w = [...weights].sort((a, b) => a - b);
+      return w.length === 1 && w[0] === 400 ? name : `${name}:wght@${w.join(';')}`;
+    }
+    function fontStylesheet(query) {
+      return new Promise(resolve => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://fonts.googleapis.com/css2?${query}&display=swap&text=${encodeURIComponent(NAME_FONT_TEXT)}`;
+        link.onload = () => resolve(true);
+        link.onerror = () => { link.remove(); resolve(false); };
+        document.head.appendChild(link);
+      });
+    }
+    async function loadNameFonts(fonts) {
+      const byFamily = new Map();
+      fonts.forEach(({ font, weight }) => byFamily.set(font, (byFamily.get(font) || new Set()).add(weight)));
+      const queries = [...byFamily].map(([family, weights]) => familyQuery(family, weights));
+
+      // One request for all fonts. If Google rejects it (a misspelled font or a weight the font
+      // doesn't have), retry each font on its own so only the broken one is missing.
+      if (!(await fontStylesheet(queries.join('&')))) {
+        const results = await Promise.all(queries.map(fontStylesheet));
+        results.forEach((ok, i) => {
+          if (!ok) console.warn(`Google Fonts rejected "${queries[i].slice(7).replace(/\+/g, ' ')}" — check name_font / name_weight in ${CSV_URL}`);
+        });
+      }
+      // Warm each face up so the first click on a theme doesn't flash a fallback font.
+      fonts.forEach(({ font, weight }) =>
+        document.fonts.load(`${weight} 1em "${font}"`, 'Erik Rosner')
+          .then(faces => { if (!faces.length) console.warn(`name_font "${font}" ${weight} did not load — check ${CSV_URL}`); })
+      );
+    }
+
+    // Random starting point in the 24-step cycle. Avoids repeating the
+    // same start as this visitor's last visit when the browser allows it.
+    function pickStart(n) {
+      let last = NaN;
+      try { last = parseInt(localStorage.getItem('er-last-start'), 10); } catch (e) {}
+      let i = Math.floor(Math.random() * n);
+      if (n > 1 && i === last) i = (i + 1 + Math.floor(Math.random() * (n - 1))) % n;
+      try { localStorage.setItem('er-last-start', String(i)); } catch (e) {}
+      return i;
+    }
+
+    function reveal() { root.classList.remove('loading'); }
+    setTimeout(reveal, 2500); // safety net: never leave the page blank
+
+    // ---------- Hover: hand-drawn underline ----------
+    // Osmo Supply "Draw Random Underline" (GSAP + DrawSVGPlugin). The six lines, decorateSVG,
+    // the shared nextIndex and the draw-in / draw-out logic are Osmo's. Adapted for this page:
+    //   · lines are drawn in one overlay layer instead of a box inside each link, so inline links
+    //     can wrap (one line per row, drawn left to right in sequence) and nothing shifts;
+    //   · they also appear on keyboard focus, and appear/disappear instantly with reduced motion;
+    //   · position and size come from tokens.css, measured from each font's baseline.
+    const tokens = getComputedStyle(root);
+    const token = (name, fallback) => tokens.getPropertyValue(name).trim() || fallback;
+    // "550ms" or "0.55s" → seconds, for GSAP
+    const seconds = value => (/ms$/.test(value) ? parseFloat(value) / 1000 : parseFloat(value));
+    const UNDERLINE = {
+      height: parseFloat(token('--underline-height', '0.42')),      // line box height × font size
+      offset: parseFloat(token('--underline-offset', '0.32')),      // links: baseline → line centre × font size
+      inkGap: parseFloat(token('--underline-ink-gap', '0.18')),     // name + icon: lowest ink → line centre × size
+      duration: seconds(token('--underline-duration', '550ms')),
+      ease: token('--underline-ease', 'power2.inOut'),
+    };
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const canDraw = !!(window.gsap && window.DrawSVGPlugin);
+    if (canDraw) {
+      gsap.registerPlugin(DrawSVGPlugin);
+      root.classList.add('draw-ready');
+    }
+
+    const svgVariants = [
+      `<svg width="310" height="40" viewBox="0 0 310 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 20.9999C26.7762 16.2245 49.5532 11.5572 71.7979 14.6666C84.9553 16.5057 97.0392 21.8432 109.987 24.3888C116.413 25.6523 123.012 25.5143 129.042 22.6388C135.981 19.3303 142.586 15.1422 150.092 13.3333C156.799 11.7168 161.702 14.6225 167.887 16.8333C181.562 21.7212 194.975 22.6234 209.252 21.3888C224.678 20.0548 239.912 17.991 255.42 18.3055C272.027 18.6422 288.409 18.867 305 17.9999" stroke="currentColor" stroke-width="10" stroke-linecap="round"/></svg>`,
+      `<svg width="310" height="40" viewBox="0 0 310 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 24.2592C26.233 20.2879 47.7083 16.9968 69.135 13.8421C98.0469 9.5853 128.407 4.02322 158.059 5.14674C172.583 5.69708 187.686 8.66104 201.598 11.9696C207.232 13.3093 215.437 14.9471 220.137 18.3619C224.401 21.4596 220.737 25.6575 217.184 27.6168C208.309 32.5097 197.199 34.281 186.698 34.8486C183.159 35.0399 147.197 36.2657 155.105 26.5837C158.11 22.9053 162.993 20.6229 167.764 18.7924C178.386 14.7164 190.115 12.1115 201.624 10.3984C218.367 7.90626 235.528 7.06127 252.521 7.49276C258.455 7.64343 264.389 7.92791 270.295 8.41825C280.321 9.25056 296 10.8932 305 13.0242" stroke="#E55050" stroke-width="10" stroke-linecap="round"/></svg>`,
+      `<svg width="310" height="40" viewBox="0 0 310 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 29.5014C9.61174 24.4515 12.9521 17.9873 20.9532 17.5292C23.7742 17.3676 27.0987 17.7897 29.6575 19.0014C33.2644 20.7093 35.6481 24.0004 39.4178 25.5014C48.3911 29.0744 55.7503 25.7731 63.3048 21.0292C67.9902 18.0869 73.7668 16.1366 79.3721 17.8903C85.1682 19.7036 88.2173 26.2464 94.4121 27.2514C102.584 28.5771 107.023 25.5064 113.276 20.6125C119.927 15.4067 128.83 12.3333 137.249 15.0014C141.418 16.3225 143.116 18.7528 146.581 21.0014C149.621 22.9736 152.78 23.6197 156.284 24.2514C165.142 25.8479 172.315 17.5185 179.144 13.5014C184.459 10.3746 191.785 8.74853 195.868 14.5292C199.252 19.3205 205.597 22.9057 211.621 22.5014C215.553 22.2374 220.183 17.8356 222.979 15.5569C225.4 13.5845 227.457 11.1105 230.742 10.5292C232.718 10.1794 234.784 12.9691 236.164 14.0014C238.543 15.7801 240.717 18.4775 243.356 19.8903C249.488 23.1729 255.706 21.2551 261.079 18.0014C266.571 14.6754 270.439 11.5202 277.146 13.6125C280.725 14.7289 283.221 17.209 286.393 19.0014C292.321 22.3517 298.255 22.5014 305 22.5014" stroke="#E55050" stroke-width="10" stroke-linecap="round"/></svg>`,
+      `<svg width="310" height="40" viewBox="0 0 310 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.0039 32.6826C32.2307 32.8412 47.4552 32.8277 62.676 32.8118C67.3044 32.807 96.546 33.0555 104.728 32.0775C113.615 31.0152 104.516 28.3028 102.022 27.2826C89.9573 22.3465 77.3751 19.0254 65.0451 15.0552C57.8987 12.7542 37.2813 8.49399 44.2314 6.10216C50.9667 3.78422 64.2873 5.81914 70.4249 5.96641C105.866 6.81677 141.306 7.58809 176.75 8.59886C217.874 9.77162 258.906 11.0553 300 14.4892" stroke="#E55050" stroke-width="10" stroke-linecap="round"/></svg>`,
+      `<svg width="310" height="40" viewBox="0 0 310 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.99805 20.9998C65.6267 17.4649 126.268 13.845 187.208 12.8887C226.483 12.2723 265.751 13.2796 304.998 13.9998" stroke="currentColor" stroke-width="10" stroke-linecap="round"/></svg>`,
+      `<svg width="310" height="40" viewBox="0 0 310 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 29.8857C52.3147 26.9322 99.4329 21.6611 146.503 17.1765C151.753 16.6763 157.115 15.9505 162.415 15.6551C163.28 15.6069 165.074 15.4123 164.383 16.4275C161.704 20.3627 157.134 23.7551 153.95 27.4983C153.209 28.3702 148.194 33.4751 150.669 34.6605C153.638 36.0819 163.621 32.6063 165.039 32.2029C178.55 28.3608 191.49 23.5968 204.869 19.5404C231.903 11.3436 259.347 5.83254 288.793 5.12258C294.094 4.99476 299.722 4.82265 305 5.45025" stroke="#E55050" stroke-width="10" stroke-linecap="round"/></svg>`
+    ];
+
+    // Add attributes to <svg> elements (Osmo)
+    function decorateSVG(svgEl) {
+      svgEl.setAttribute('preserveAspectRatio', 'none');
+      svgEl.querySelectorAll('path').forEach(path => {
+        path.setAttribute('stroke', 'currentColor');
+      });
+    }
+
+    // Where each line goes, in page coordinates: one row per line of text.
+    // Fonts report very different "descent" metrics (Ballet's is huge, Faster One's tiny), so the
+    // name's line is placed from the actual lowest ink of "Erik Rosner", the same gap for every font.
+    const inkCanvas = document.createElement('canvas').getContext('2d');
+    function metrics(el, text) {
+      const cs = getComputedStyle(el);
+      inkCanvas.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const m = inkCanvas.measureText(text);
+      return { size: parseFloat(cs.fontSize), fontDescent: m.fontBoundingBoxDescent, ink: Math.max(0, m.actualBoundingBoxDescent || 0) };
+    }
+    function baselineOf(el) {
+      const probe = document.createElement('span');
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      el.appendChild(probe);
+      const y = probe.getBoundingClientRect().top;
+      probe.remove();
+      return y;
+    }
+    function row(rect, centre, size) {
+      const h = UNDERLINE.height * size;
+      return { left: rect.left + scrollX, top: centre - h / 2 + scrollY, width: rect.width, height: h };
+    }
+    function linesFor(el) {
+      if (el === wordmark) {
+        const m = metrics(wordmarkText, wordmarkText.textContent);
+        const baseline = baselineOf(wordmarkText);
+        // Sized from the intro text, not the name font, so the line is equally thick in every theme
+        // (each font's name_size multiplier would otherwise make it heavier) — and never deeper than
+        // a link's line (--underline-offset), so long flourishes (Ballet) can't push it onto the next row.
+        const size = parseFloat(getComputedStyle(wordmark.parentElement).fontSize);
+        const centre = baseline + Math.min(m.ink + UNDERLINE.inkGap * size, UNDERLINE.offset * size);
+        return [row(wordmarkText.getBoundingClientRect(), centre, size)];
+      }
+      const m = metrics(el, 'x');
+      return [...el.getClientRects()]
+        .filter(r => r.width > 1)
+        .map(r => row(r, r.bottom - m.fontDescent + UNDERLINE.offset * m.size, m.size));
+    }
+
+    const layer = document.createElement('div');
+    layer.className = 'underline-layer';
+    layer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(layer);
+    const underlines = new Map();   // element → { refresh() } for the ones currently drawn
+
+    let nextIndex = null;
+
+    function initDrawRandomUnderline(targets) {
+      if (!canDraw) return;
+      targets.forEach(container => {
+        let boxes = [];
+        let enterTween = null;
+        let leaveTween = null;
+
+        const paths = () => boxes.map(b => b.querySelector('path'));
+        const clear = () => { boxes.forEach(b => b.remove()); boxes = []; underlines.delete(container); };
+        const position = () => {
+          const lines = linesFor(container);
+          if (lines.length !== boxes.length) return false;
+          lines.forEach((l, i) => Object.assign(boxes[i].style, {
+            left: `${l.left}px`, top: `${l.top}px`, width: `${l.width}px`, height: `${l.height}px`,
+          }));
+          return true;
+        };
+        // Draw (or erase) every row in turn, left to right, as one eased stroke.
+        const sequence = (to, onComplete) => {
+          const widths = boxes.map(b => parseFloat(b.style.width) || 1);
+          const total = widths.reduce((a, b) => a + b, 0);
+          const tl = gsap.timeline({ paused: true });
+          paths().forEach((p, i) => tl.to(p, { drawSVG: to, duration: widths[i] / total, ease: 'none' }));
+          return gsap.to(tl, {
+            progress: 1,
+            duration: reduceMotion.matches ? 0 : UNDERLINE.duration,
+            ease: UNDERLINE.ease,
+            onComplete,
+          });
+        };
+
+        const enter = () => {
+          // Don't restart if still playing
+          if (enterTween && enterTween.isActive()) return;
+          if (leaveTween && leaveTween.isActive()) leaveTween.kill();
+
+          // Random Start
+          if (nextIndex === null) {
+            nextIndex = Math.floor(Math.random() * svgVariants.length);
+          }
+
+          // Animate Draw
+          clear();
+          boxes = linesFor(container).map(() => {
+            const box = document.createElement('div');
+            box.className = 'underline-box';
+            box.innerHTML = svgVariants[nextIndex];
+            decorateSVG(box.querySelector('svg'));
+            layer.appendChild(box);
+            return box;
+          });
+          position();
+          // Re-place on layout changes; if a link now wraps differently, redraw it.
+          underlines.set(container, { refresh: () => {
+            if (position()) return;
+            if (enterTween) enterTween.kill();
+            enterTween = null;
+            enter();
+          } });
+          gsap.set(paths(), { drawSVG: '0%' });
+          enterTween = sequence('100%', () => { enterTween = null; });
+
+          // Advance for next hover across all items
+          nextIndex = (nextIndex + 1) % svgVariants.length;
+        };
+
+        const leave = () => {
+          if (!boxes.length) return;
+
+          const playOut = () => {
+            // Don't restart if still drawing out
+            if (leaveTween && leaveTween.isActive()) return;
+            leaveTween = sequence('100% 100%', () => {
+              leaveTween = null;
+              clear(); // remove SVG when done
+            });
+          };
+
+          if (enterTween && enterTween.isActive()) {
+            // Wait until draw-in finishes
+            enterTween.eventCallback('onComplete', playOut);
+          } else {
+            playOut();
+          }
+        };
+
+        container.addEventListener('mouseenter', enter);
+        container.addEventListener('mouseleave', () => { if (!container.matches(':focus-visible')) leave(); });
+        container.addEventListener('focus', () => { if (container.matches(':focus-visible')) enter(); });
+        container.addEventListener('blur', () => { if (!container.matches(':hover')) leave(); });
+      });
+    }
+
+    // Keep drawn lines attached to their text when the layout changes
+    // (window resize, a new name font after a click, late-loading fonts).
+    function refreshUnderlines() { underlines.forEach(u => u.refresh()); }
+    let refreshQueued = false;
+    window.addEventListener('resize', () => {
+      if (refreshQueued) return;
+      refreshQueued = true;
+      requestAnimationFrame(() => { refreshQueued = false; refreshUnderlines(); });
+    });
+    document.fonts.addEventListener('loadingdone', refreshUnderlines);
+
+    initDrawRandomUnderline([wordmark]);   // the name only: body links use the CSS underline, the icon has none
+
+    // ---------- Magnetic hover on the clue icon (Osmo Supply "Magnetic Hover Effect", GSAP) ----------
+    // Osmo's code as supplied (same pull math, eases and timings). Changes:
+    //   · Osmo turns the effect off on windows ≤ 991px wide (checked once, at load) to skip tablets and
+    //     phones. That also switched it off in narrow desktop windows, so instead every pointer event
+    //     checks what is pointing: a mouse or a pen (Wacom etc.) gets the effect at any window size,
+    //     touch never does. Also off with reduced motion, or if GSAP didn't load.
+    //   · Any [data-magnetic-follow="<magnet id>"] element gets exactly the magnet's own movement,
+    //     so the clue travels with the icon's container. The pull is still measured on the button alone.
+    const magnetActive = e => !!window.gsap && (e.pointerType === 'mouse' || e.pointerType === 'pen') && !reduceMotion.matches;
+    function initMagneticEffect() {
+      const magnets = document.querySelectorAll('[data-magnetic-strength]');
+
+      // The magnet plus anything that follows it.
+      const withFollowers = m => [m, ...(m.id ? document.querySelectorAll(`[data-magnetic-follow="${m.id}"]`) : [])];
+
+      // Helper to kill tweens and reset an element.
+      const resetEl = (el, immediate) => {
+        if (!el) return;
+        gsap.killTweensOf(el);
+        (immediate ? gsap.set : gsap.to)(el, {
+          x: "0em",
+          y: "0em",
+          rotate: "0deg",
+          clearProps: "all",
+          ...(!immediate && { ease: "elastic.out(1, 0.3)", duration: 1.6 })
+        });
+      };
+
+      const resetOnEnter = e => {
+        if (!magnetActive(e)) return;
+        const m = e.currentTarget;
+        withFollowers(m).forEach(el => resetEl(el, true));
+        resetEl(m.querySelector('[data-magnetic-inner-target]'), true);
+      };
+
+      const moveMagnet = e => {
+        if (!magnetActive(e)) return;
+        const m = e.currentTarget,
+          b = m.getBoundingClientRect(),
+          strength = parseFloat(m.getAttribute('data-magnetic-strength')) || 25,
+          inner = m.querySelector('[data-magnetic-inner-target]'),
+          innerStrength = parseFloat(m.getAttribute('data-magnetic-strength-inner')) || strength,
+          offsetX = ((e.clientX - b.left) / m.offsetWidth - 0.5) * (strength / 16),
+          offsetY = ((e.clientY - b.top) / m.offsetHeight - 0.5) * (strength / 16);
+
+        gsap.to(withFollowers(m), { x: offsetX + "em", y: offsetY + "em", rotate: "0.001deg", ease: "power4.out", duration: 1.6 });
+
+        if (inner) {
+          const innerOffsetX = ((e.clientX - b.left) / m.offsetWidth - 0.5) * (innerStrength / 16),
+            innerOffsetY = ((e.clientY - b.top) / m.offsetHeight - 0.5) * (innerStrength / 16);
+          gsap.to(inner, { x: innerOffsetX + "em", y: innerOffsetY + "em", rotate: "0.001deg", ease: "power4.out", duration: 2 });
+        }
+      };
+
+      const resetMagnet = e => {
+        if (!window.gsap) return;          // always spring back, even if the window just got narrow
+        const m = e.currentTarget,
+          inner = m.querySelector('[data-magnetic-inner-target]');
+        gsap.to(withFollowers(m), { x: "0em", y: "0em", ease: "elastic.out(1, 0.3)", duration: 1.6, clearProps: "all" });
+        if (inner) {
+          gsap.to(inner, { x: "0em", y: "0em", ease: "elastic.out(1, 0.3)", duration: 2, clearProps: "all" });
+        }
+      };
+
+      magnets.forEach(m => {
+        m.addEventListener('pointerenter', resetOnEnter);   // Osmo: mouseenter
+        m.addEventListener('pointermove', moveMagnet);      // Osmo: mousemove
+        m.addEventListener('pointerleave', resetMagnet);    // Osmo: mouseleave
+      });
+    }
+
+    // Initialize Magnetic Effect
+    initMagneticEffect();
+
+    // ---------- Custom cursor (Osmo Supply "Velocity Based Custom Cursor", no libraries) ----------
+    // Osmo's code as supplied. Additions: it only runs with a real mouse (not touch screens); it takes
+    // over from the browser's cursor on the first mouse move (html.has-custom-cursor), so the custom
+    // one never sits in the corner; and with reduced motion it doesn't tilt.
+    function initVelocityBasedCustomCursor() {
+      const cursor = document.querySelector(".cursor");
+      if (!cursor || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      const innerElements = cursor.querySelectorAll(".cursor-inner");
+
+      innerElements.forEach(el => el.style.transformOrigin = "50% 50%");
+
+      let currentRotation = 0;
+      let targetRotation = 0;
+      let lastX = 0;
+      let lastTime = performance.now();
+
+      document.addEventListener("mousemove", e => {
+        // Make the cursor follow the actual client position
+        cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+        root.classList.add('has-custom-cursor');
+
+        // Get current time in miliseconds
+        const currentTime = performance.now();
+
+        // Calculate ellasped time since last move
+        const timeDifference = currentTime - lastTime;
+
+        if (timeDifference > 0) {
+          const positionDifference = e.clientX - lastX;
+          const velocityX = positionDifference / timeDifference;
+
+          // Clamp the rotation between -70 and 70 degrees
+          targetRotation = reduceMotion.matches ? 0 : Math.max(Math.min(velocityX * 100, 70), -70);
+        }
+        lastX = e.clientX;
+        lastTime = currentTime;
+      });
+
+      // Use a RAF method to match display refresh rate for smoothest result
+      function animateRotation() {
+        currentRotation += (targetRotation - currentRotation) * 0.1;
+        targetRotation += (0 - targetRotation) * 0.05;
+        innerElements.forEach(el => el.style.transform = `rotate(${currentRotation}deg)`);
+        requestAnimationFrame(animateRotation);
+      }
+      animateRotation();
+    }
+
+    // Initialize Velocity Based Custom Cursor
+    initVelocityBasedCustomCursor();
+
+    // ---------- Hint: icon + clue for the active theme ----------
+    function setHint(clue) {
+      hintText.textContent = clue.text;
+      // A theme without an icon still gets a clickable icon (sparkle).
+      hintIcon.setAttribute('href', `${ICON_SPRITE}#ph-${clue.icon || 'sparkle'}`);
+    }
+
+    let themeChangeTimer = 0;
+    function applyPalette(i) {
+      const p = SEQUENCE[i];
+      // Keep the icon, name and name underline in step with the theme fade (see html.theme-changing in the CSS).
+      root.classList.add('theme-changing');
+      clearTimeout(themeChangeTimer);
+      themeChangeTimer = setTimeout(() => root.classList.remove('theme-changing'),
+        seconds(token('--theme-duration', '340ms')) * 1000 + 50);
+      root.style.setProperty('--bg', p.bg);
+      root.style.setProperty('--fg', p.fg);
+      root.style.setProperty('--hover', p.hover);
+      root.style.setProperty('--name-font', `"${p.font}"`);
+      root.style.setProperty('--name-scale', p.size);
+      root.style.setProperty('--name-weight', p.weight);
+      themeMeta.setAttribute('content', p.bg);
+      setHint(p.clue);
+      refreshUnderlines();   // the name may have changed font/size under a drawn line
+    }
+
+    // ---------- Vertical placement: top-aligned, but visually centered ----------
+    // Every theme has a different height (name font, clue length). Measure all of them in a hidden
+    // copy of the content at the current window size, then push the content down so the TALLEST one
+    // would sit centered. Every theme starts at that same top edge, so clicking never moves the name.
+    // --visual-center in tokens.css turns this off (0 = plain top alignment, used on phones).
+    const main = document.querySelector('main');
+    function placeContent() {
+      if (!SEQUENCE.length) return;
+      const on = parseFloat(getComputedStyle(root).getPropertyValue('--visual-center')) || 0;
+      if (!on) { main.style.setProperty('--main-offset', '0px'); return; }
+
+      const box = document.createElement('div');
+      box.setAttribute('aria-hidden', 'true');
+      box.style.cssText = `position:absolute;left:0;top:0;width:${main.clientWidth}px;visibility:hidden;pointer-events:none`;
+      const copy = main.cloneNode(true);
+      copy.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+      copy.removeAttribute('style');
+      copy.style.setProperty('--main-offset', '0px');
+      box.appendChild(copy);
+      document.body.appendChild(box);
+      const clue = copy.querySelector('.hint-text');
+      let tallest = 0;
+      SEQUENCE.forEach(p => {
+        copy.style.setProperty('--name-font', `"${p.font}"`);
+        copy.style.setProperty('--name-scale', p.size);
+        copy.style.setProperty('--name-weight', p.weight);
+        clue.textContent = p.clue.text;
+        tallest = Math.max(tallest, copy.getBoundingClientRect().height);
+      });
+      box.remove();
+
+      const body = getComputedStyle(document.body);
+      const room = innerHeight - parseFloat(body.paddingTop) - parseFloat(body.paddingBottom);
+      main.style.setProperty('--main-offset', `${Math.max(0, (room - tallest) / 2).toFixed(1)}px`);
+      refreshUnderlines();   // keep a drawn underline attached if the content moved
+    }
+    let placeQueued = false;   // at most once per frame while the window is resized / fonts arrive
+    function queuePlace() {
+      if (placeQueued) return;
+      placeQueued = true;
+      requestAnimationFrame(() => { placeQueued = false; placeContent(); });
+    }
+    window.addEventListener('resize', queuePlace);
+    document.fonts.addEventListener('loadingdone', queuePlace);
+
+    // The name and the clue icon are two buttons for the same action: next theme.
+    function nextTheme() {
+      if (!SEQUENCE.length) return;
+      current = (current + 1) % SEQUENCE.length;
+      applyPalette(current);
+    }
+    wordmark.addEventListener('click', nextTheme);
+    hintButton.addEventListener('click', nextTheme);
+
+    // Start on a random palette; clicks then move forward through the same fixed order.
+    loadThemes()
+      .then(async seq => {
+        SEQUENCE = seq;
+        current = pickStart(SEQUENCE.length);
+        applyPalette(current);
+        placeContent();
+        // Wait (briefly) for the starting font so the name never flashes a fallback.
+        const timeout = new Promise(r => setTimeout(r, 1500));
+        await Promise.race([
+          fontsReady.then(() => document.fonts.load(`${SEQUENCE[current].weight} 1em "${SEQUENCE[current].font}"`, 'Erik Rosner')),
+          timeout,
+        ]).catch(() => {});
+        placeContent();
+        reveal();
+      })
+      .catch(err => { console.error('Could not load themes.csv —', err.message); reveal(); });
+  </script>
+</body>
+</html>

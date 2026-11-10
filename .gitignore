@@ -1,0 +1,22 @@
+# Build output (recreated by scripts/build.py and by GitHub Actions)
+_site/
+
+# Secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+
+# Local / OS / editor files
+.DS_Store
+.claude/
+__pycache__/
+*.pyc
+
+# Working material kept out of the public repository
+# (GitHub Pages on a free plan needs a public repo, so anything committed is public)
+_archive/
+REFERENCE-IMAGES/
+mockup.png
+ERIKROSNER_CLAUDE_CODE_BRIEF.md
+ERIKROSNER_DEPLOYMENT_GUIDE.md

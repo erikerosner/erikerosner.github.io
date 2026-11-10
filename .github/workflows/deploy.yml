@@ -1,0 +1,40 @@
+name: Deploy ErikRosner.com
+
+# Static site: no Node, no npm. scripts/build.py runs the checks, then copies only the
+# public files into _site/, which GitHub Pages serves.
+# Action versions checked Nov 10, 2026 (all on GitHub's Node 24 runtime). upload-pages-artifact v4+
+# skips hidden files such as _site/.nojekyll, which GitHub Actions deploys don't need anyway.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+      - name: Check and stage site
+        run: python3 scripts/build.py
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
