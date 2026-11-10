@@ -163,9 +163,9 @@ Any `#` placeholder link shows up as a warning until it has a real URL.
 In short:
 
 1. Run `python3 scripts/build.py`, then turn the folder into a Git repository with GitHub Desktop (the `.gitignore` keeps reference images, briefs, `_archive/` and `_site/` out).
-2. Publish it as the public repository `erikrosner.github.io`.
-3. Repo → Settings → Pages → **Source: GitHub Actions**, re-run **Deploy ErikRosner.com**, and test `https://erikrosner.github.io/`.
+2. Publish it as the public repository `erikerosner.github.io`.
+3. Repo → Settings → Pages → **Source: GitHub Actions**, re-run **Deploy ErikRosner.com**, and test `https://erikerosner.github.io/`.
 4. Verify the domain (account Settings → Pages), then set the repo's custom domain to `erikrosner.com`.
-5. GoDaddy DNS: four GitHub A records on `@`, `www` CNAME → `erikrosner.github.io`. Keep the MX/TXT email records. Then enforce HTTPS, and retire Webflow last.
+5. GoDaddy DNS: four GitHub A records on `@`, `www` CNAME → `erikerosner.github.io`. Keep the MX/TXT email records. Then enforce HTTPS, and retire Webflow last.
 
 **Later updates:** edit, run `python3 scripts/build.py`, then commit and push in GitHub Desktop. The site redeploys in about a minute.

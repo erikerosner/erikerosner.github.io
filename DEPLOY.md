@@ -12,12 +12,12 @@ A click-by-click guide for putting this site live on GitHub Pages at **erikrosne
 
 You need:
 
-- [ ] A **GitHub account**. If you don't have one, go to https://github.com/signup. The **username** you pick appears in a temporary web address (`username.github.io`), so choose something professional, e.g. `erikrosner` if it's free.
+- [ ] A **GitHub account**. If you don't have one, go to https://github.com/signup. The **username** you pick appears in a temporary web address (`username.github.io`), so choose something professional, e.g. your name if it's free.
 - [ ] Your **GoDaddy** login. erikrosner.com is registered at GoDaddy, and its DNS is managed there.
 - [ ] Your **Webflow** login (only needed at the very end, days later).
 - [ ] The **GitHub Desktop** app (free; installed in Part 1).
 
-Your GitHub username is **erikrosner**. It is already filled in everywhere below (it was checked on Nov 10, 2026: the account exists and `erikrosner.github.io` is free to use as the repository name).
+Your GitHub username is **erikerosner** (with an "e" after Erik, like your email). It is filled in everywhere below. The repository must be named exactly `erikerosner.github.io`; any other name publishes the site one folder down (`erikerosner.github.io/<repository-name>/`).
 
 
 ### Write down what's there now (your backup)
@@ -111,7 +111,7 @@ The repository will be **public**, so everything committed can be read by anyone
 
 1. In GitHub Desktop, click **Publish repository** (top right).
 2. In the window (tab **GitHub.com**):
-   - **Name:** `erikrosner.github.io`, with your username exactly, all lowercase.
+   - **Name:** `erikerosner.github.io`, with your username exactly, all lowercase.
    - **Description:** optional, e.g. `ErikRosner.com`.
    - **Keep this code private:** **UNCHECK this.** Free GitHub accounts can only publish public repositories as websites.
    - **Organization:** None.
@@ -139,12 +139,12 @@ Publishing makes GitHub try to launch the site right away, before Pages is switc
 3. On the right, click the **Run workflow** button, keep **Branch: main**, and click the green **Run workflow**.
    - Or open the red run and click **Re-run jobs → Re-run all jobs**.
 4. Wait about a minute and refresh. ✅ **Check:** the new run has a **green ✓**.
-   - Click the run: under **build-and-deploy** you'll see a link like `https://erikrosner.github.io/`.
+   - Click the run: under **build-and-deploy** you'll see a link like `https://erikerosner.github.io/`.
    - If it's red, click it, then click the step with the ✗ and read the message. A failure in **Check and stage site** shows the same `ERROR:` text as step 1.1.
 
 ### 3.3 Test the site at its temporary address
 
-Open `https://erikrosner.github.io/` and check:
+Open `https://erikerosner.github.io/` and check:
 
 - [ ] The page appears in a random color theme with the name in its font.
 - [ ] Clicking **the name** or **the clue icon** steps through themes. Click around 26 times to see them all, including Seattle in Modak.
@@ -166,7 +166,7 @@ This stops anyone else from ever attaching erikrosner.com to their own GitHub si
 1. On github.com, click your **profile photo** (top right) → **Settings**.
 2. In the left sidebar, under **Code, planning, and automation**, click **Pages**.
 3. Click **Add a domain**, type `erikrosner.com`, and click **Add domain**.
-4. GitHub shows a **TXT record** to create, with a name like `_github-pages-challenge-erikrosner` and a long code as its value. **Keep this tab open.** You'll add the record in step 5.4, then come back here and click **Verify**.
+4. GitHub shows a **TXT record** to create, with a name like `_github-pages-challenge-erikerosner` and a long code as its value. **Keep this tab open.** You'll add the record in step 5.4, then come back here and click **Verify**.
 
 ### 4.2 Add the custom domain to the site
 
@@ -210,11 +210,11 @@ Pick a quiet time: for up to an hour, some visitors may see the old site or a ce
 ### 5.3 Point `www` to GitHub
 
 1. Find the row **Type CNAME, Name `www`, Data `cdn.webflow.com`**. Click the **pencil**.
-2. Change Data to `erikrosner.github.io` (no `https://`, no slash) and click **Save**.
+2. Change Data to `erikerosner.github.io` (no `https://`, no slash) and click **Save**.
 
 ### 5.4 Add GitHub's ownership record (from step 4.1)
 
-1. Click **Add New Record**: **Type TXT**. Paste **Name** from GitHub (`_github-pages-challenge-erikrosner`; GoDaddy adds `.erikrosner.com` by itself) and paste **Value** from GitHub. Click **Save**.
+1. Click **Add New Record**: **Type TXT**. Paste **Name** from GitHub (`_github-pages-challenge-erikerosner`; GoDaddy adds `.erikrosner.com` by itself) and paste **Value** from GitHub. Click **Save**.
 2. Back in the GitHub tab from 4.1, click **Verify**. If it says the record isn't found yet, wait 10 minutes and click **Verify** again.
 
 ### 5.5 Don't touch
@@ -236,7 +236,7 @@ Then:
 ```bash
 dig +short www.erikrosner.com
 ```
-✅ **Done when** the first line is `erikrosner.github.io.`
+✅ **Done when** the first line is `erikerosner.github.io.`
 
 (Or check from anywhere at https://www.whatsmydns.net: type `erikrosner.com` and choose **A**.)
 
@@ -294,7 +294,7 @@ If a check fails on GitHub, the run turns red and **the live site stays as it wa
 |---|---|
 | Actions run is red at **Configure Pages** | Part 3.1 isn't done: set Source to **GitHub Actions**, then re-run (3.2). |
 | Actions run is red at **Check and stage site** | Click it and read the `ERROR:` lines. Fix them locally, check with step 1.1, then commit and push. |
-| `erikrosner.github.io` shows **404** | Wait 2 minutes after a green run. Check the repository name is exactly `erikrosner.github.io` and that it's **public**. |
+| `erikerosner.github.io` shows **404** | Wait 2 minutes after a green run. Check the repository name is exactly `erikerosner.github.io` (your username + `.github.io`) and that it's **public**. If it has any other name, the site is at `erikerosner.github.io/<repository-name>/` instead: rename it under **Settings → General → Repository name**, then re-run the workflow. |
 | Page loads but has no colors or clues | Hard refresh (`⌘ Shift R`). Check that `themes.csv` was committed (step 1.4). |
 | erikrosner.com still shows Webflow | DNS hasn't switched yet. Run the `dig` check (5.6), and confirm no `198.202.211.1` A record is left in GoDaddy. |
 | Browser says "Your connection is not private" | The certificate isn't ready yet. Wait up to an hour after **DNS check successful**, then tick **Enforce HTTPS**. |
