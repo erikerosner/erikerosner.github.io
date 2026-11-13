@@ -24,6 +24,7 @@
    is truly centered) and 9.5vw at the sides. Phones: 10vh / 7vw / 4vh.
 
    Body columns are sized by characters per line (--body-cpl), not pixels.
+   Phones (≤768px): body text and clue go up one step (--step-1) and run full width.
 
    Theme colors, the per-theme name font, clue text and icons come from themes.csv.
    ========================================================================== */
@@ -159,5 +160,8 @@
     --visual-center: 0;              /* phones: content simply starts at the top */
     --columns-align: start;          /* one column, flush left under the intro */
     --intro-max-width: 100%;
+    --font-size-body: var(--step-1); /* one step up the scale from desktop's step 0 (16 → ≈20px on a phone) */
+    --font-size-hint: var(--step-1); /* the clue matches the body text */
+    --body-measure: 100%;            /* body text runs the full content width, not --body-cpl */
   }
 }
